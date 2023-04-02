@@ -3,10 +3,7 @@ package qing.jin.calendar.Controller;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import qing.jin.calendar.Model.Content;
 import qing.jin.calendar.Model.Status;
@@ -31,9 +28,29 @@ public class ContentController {
         return contentCollectionRepo.findall();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Content findById(@PathVariable Integer id) {
         return contentCollectionRepo.findById(id).
                 orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Resources Not Found"));
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("")
+    public void create(@RequestBody Content newContent) {
+        contentCollectionRepo.save(newContent);
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PutMapping("/{id}")
+    public void update(@RequestBody Content existingContent, @PathVariable Integer id) {
+        if(!contentCollectionRepo.existById(id)) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Content does not exist");
+        }
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        contentCollectionRepo.delete(id);
     }
 }
